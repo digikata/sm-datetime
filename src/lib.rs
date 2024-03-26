@@ -5,9 +5,9 @@ use serde_json::{json, Value};
 
 use fluvio_smartmodule::{
     dataplane::smartmodule::{SmartModuleExtraParams, SmartModuleInitError},
-    eyre, smartmodule, Record, RecordData, Result,
+    eyre, smartmodule, SmartModuleRecord, RecordData, Result,
 };
-use chrono::{FixedOffset, TimeZone, Utc};
+use chrono::{FixedOffset, NaiveDateTime, TimeZone};
 
 static SPEC: OnceCell<DateOpsParams> = OnceCell::new();
 const PARAM_NAME: &str = "spec";
@@ -22,21 +22,22 @@ struct DateOpsParams {
 }
 
 #[smartmodule(map)]
-pub fn map(record: &Record) -> Result<(Option<RecordData>, RecordData)> {
+pub fn map(record: &SmartModuleRecord) -> Result<(Option<RecordData>, RecordData)> {
     let key: Option<RecordData> = record.key.clone();
     let spec = SPEC.get().wrap_err("spec is not initialized")?;
     let record_data: Value = serde_json::from_slice(record.value.as_ref())?;
 
-    let source_timezone = FixedOffset::east(spec.source_timezone * 3600);
+    let source_timezone = FixedOffset::east_opt(spec.source_timezone * 3600).unwrap();
 
     let mut updated_record_data = record_data.clone();
     for field in &spec.fields {
         if let Some(date_str) = record_data.get(field).and_then(Value::as_str) {
-            let date = source_timezone
-                .datetime_from_str(date_str, &spec.source_format)
+            let ndt = NaiveDateTime::parse_from_str(date_str, &spec.source_format)
                 .map_err(|e| eyre!("Failed to parse date: {}", e))?;
-
-            let utc_date = date.with_timezone(&Utc);
+            // unwrap always succeeds because of Fixed offset of source_timezone
+            // see https://docs.rs/chrono/latest/chrono/offset/enum.MappedLocalTime.html
+            let dt_tz = source_timezone.from_local_datetime(&ndt).unwrap();
+            let utc_date = dt_tz.to_utc();
             let formatted_date = utc_date.format(&spec.output_format).to_string();
             updated_record_data[field] = json!(formatted_date);
         }
