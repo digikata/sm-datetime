@@ -29,7 +29,7 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "chrono"
 version = "0.4.37"
-source = "git+https://github.com/digikata/chrono?branch=no-js-sys#1f173e6e6bfd904c843a27992882bdc0b5bf9d12"
+source = "git+https://github.com/digikata/chrono?branch=no-js-sys#dccdbf73e8d1b5cac121322dad43f5fa7d17522c"
 dependencies = [
  "num-traits",
  "serde",

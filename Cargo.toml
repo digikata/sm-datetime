@@ -16,12 +16,14 @@ serde_json = "1"
 eyre = {version ="0.6.12", default-features = false }
 once_cell = { version = "1.17.1", default-features = false }
 
-[dependencies.chrono]
-# version = "0.4.34"
-git = "https://github.com/digikata/chrono"
-branch = "no-js-sys"
-features = ["alloc", "serde", "wasmbind"]
-default-features = false
+chrono = { git = "https://github.com/digikata/chrono", branch = "no-js-sys", features = ["alloc", "serde", "wasmbind"], default-features = false}
+
+# [dependencies.chrono]
+# # version = "0.4.34"
+# git = "https://github.com/digikata/chrono"
+# branch = "no-js-sys"
+# features = ["alloc", "serde", "wasmbind"]
+# default-features = false
 
 
 [profile.release-lto]

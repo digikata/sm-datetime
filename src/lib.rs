@@ -1,16 +1,16 @@
 use eyre::ContextCompat;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+// use serde_json::{json, Value};
 
 use fluvio_smartmodule::{
-    dataplane::smartmodule::{SmartModuleExtraParams, SmartModuleInitError},
+    dataplane::smartmodule::SmartModuleExtraParams, //, SmartModuleInitError},
     eyre, smartmodule, SmartModuleRecord, RecordData, Result,
 };
 use chrono::{FixedOffset, NaiveDateTime, TimeZone};
 
 static SPEC: OnceCell<DateOpsParams> = OnceCell::new();
-const PARAM_NAME: &str = "spec";
+// const PARAM_NAME: &str = "spec";
 
 #[derive(Debug, Serialize, Deserialize)]
 struct DateOpsParams {
@@ -82,7 +82,7 @@ fn t_date_change() -> Result<()> {
 }
 
 #[smartmodule(init)]
-fn init(params: SmartModuleExtraParams) -> Result<()> {
+fn init(_params: SmartModuleExtraParams) -> Result<()> {
     let spec = DateOpsParams {
 		source_format: "yyyy/dd/mm HH:MM:SS".to_string(),
 		output_format: "yyyy-mm-dd'T'HH:MM:SS.SSS'Z'".to_string(),
